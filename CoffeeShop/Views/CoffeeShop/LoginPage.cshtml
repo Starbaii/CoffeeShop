@@ -1,0 +1,1336 @@
+@{
+    Layout = "~/Views/Shared/_HomeLayout.cshtml";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>828 Cafe - Staff Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --color-primary: #A8A54A; /* Olive Green */
+            --color-secondary: #F4F3EC; /* Cream/Off-white */
+            --color-accent: #6F4E37; /* Coffee Brown */
+            --color-text: #2E2E2E; /* Dark Charcoal */
+            --color-light: #D8D5B5; /* Light Olive */
+            --color-dark-brown: #5C412F; /* Darker Brown */
+            --shadow: 0 8px 20px rgba(106, 84, 55, 0.12);
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            background-color: var(--color-secondary);
+            color: var(--color-text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background-image: linear-gradient(135deg, rgba(168, 165, 74, 0.03) 0%, rgba(111, 78, 55, 0.03) 100%);
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto;
+        }
+
+        /* Logo Section */
+        .logo-section {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        .logo {
+            background: linear-gradient(135deg, var(--color-primary), var(--color-dark-brown));
+            color: var(--color-secondary);
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 32px;
+            font-weight: 700;
+            box-shadow: var(--shadow);
+            border: 4px solid white;
+            position: relative;
+            overflow: hidden;
+            transform-origin: center;
+        }
+
+            .logo::after {
+                content: '';
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(circle, transparent 30%, rgba(255,255,255,0.1) 100%);
+            }
+
+            .logo img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                border-radius: 50%;
+            }
+
+        .company-name {
+            font-size: 34px;
+            font-weight: 800;
+            color: var(--color-accent);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            position: relative;
+            display: inline-block;
+        }
+
+            .company-name::after {
+                content: '';
+                position: absolute;
+                bottom: -8px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 60px;
+                height: 3px;
+                background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+                border-radius: 2px;
+            }
+
+        .company-tagline {
+            color: var(--color-primary);
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 15px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            opacity: 0.9;
+        }
+
+        /* Main Content Area */
+        .content-area {
+            position: relative;
+            min-height: 500px;
+            width: 100%;
+        }
+
+        /* Login Card & Recovery Cards */
+        .login-card,
+        .recovery-card {
+            background-color: white;
+            border-radius: 18px;
+            padding: 40px 35px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(111, 78, 55, 0.1);
+            width: 100%;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
+        }
+
+            .login-card::before,
+            .recovery-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 6px;
+                background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+                box-shadow: 0 2px 5px rgba(111, 78, 55, 0.2);
+            }
+
+        .recovery-card {
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transform: translateX(30px);
+            pointer-events: none;
+        }
+
+            .recovery-card.active {
+                opacity: 1;
+                transform: translateX(0);
+                pointer-events: all;
+                z-index: 10;
+            }
+
+        .login-card.hidden {
+            opacity: 0;
+            transform: translateX(-30px);
+            pointer-events: none;
+        }
+
+        /* Progress Steps */
+        .progress-steps {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .step {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--color-secondary);
+            color: var(--color-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            position: relative;
+            z-index: 2;
+            transition: var(--transition);
+            margin: 0 20px;
+        }
+
+            .step.active {
+                background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+                color: white;
+                transform: scale(1.1);
+                box-shadow: 0 4px 12px rgba(168, 165, 74, 0.3);
+            }
+
+            .step.completed {
+                background-color: var(--color-primary);
+                color: white;
+            }
+
+        .step-line {
+            position: absolute;
+            top: 16px;
+            left: 50px;
+            right: 50px;
+            height: 2px;
+            background-color: var(--color-secondary);
+            z-index: 1;
+        }
+
+        .step-progress {
+            position: absolute;
+            top: 16px;
+            left: 50px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+            z-index: 1;
+            transition: width 0.5s ease;
+            width: 0;
+        }
+
+        /* Role Selector */
+        .role-selector {
+            display: flex;
+            background-color: var(--color-secondary);
+            border-radius: 14px;
+            margin-bottom: 35px;
+            padding: 6px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .role-option {
+            flex: 1;
+            text-align: center;
+            padding: 16px 10px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 12px;
+            z-index: 1;
+            transition: var(--transition);
+            color: var(--color-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+            .role-option.active {
+                color: white;
+                text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+            }
+
+        .selector-background {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            width: calc(50% - 6px);
+            height: calc(100% - 10px);
+            background: linear-gradient(135deg, var(--color-accent), var(--color-dark-brown));
+            border-radius: 12px;
+            transition: var(--transition);
+            box-shadow: 0 4px 8px rgba(111, 78, 55, 0.2);
+        }
+
+            .selector-background.employee {
+                transform: translateX(100%);
+                background: linear-gradient(135deg, var(--color-primary), #8F8A3F);
+            }
+
+        /* Form Styles */
+        .login-form {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+            .login-form.active {
+                display: block;
+            }
+
+        .form-title {
+            font-size: 24px;
+            margin-bottom: 30px;
+            color: var(--color-accent);
+            font-weight: 700;
+            text-align: center;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+            .form-title::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 50px;
+                height: 2px;
+                background-color: var(--color-primary);
+                border-radius: 1px;
+            }
+
+        .recovery-title {
+            text-align: center;
+            color: var(--color-accent);
+            margin-bottom: 25px;
+            font-size: 22px;
+        }
+
+        .recovery-description {
+            text-align: center;
+            color: var(--color-text);
+            margin-bottom: 30px;
+            line-height: 1.6;
+            opacity: 0.8;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+            .input-group label {
+                display: block;
+                margin-bottom: 10px;
+                font-weight: 600;
+                color: var(--color-text);
+                font-size: 15px;
+                letter-spacing: 0.5px;
+            }
+
+        .input-icon {
+            position: absolute;
+            left: 18px;
+            top: 45px;
+            color: var(--color-accent);
+            font-size: 18px;
+            transition: var(--transition);
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 17px 20px 17px 55px;
+            border: 2px solid #e5e5e5;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: var(--transition);
+            background-color: var(--color-secondary);
+            color: var(--color-text);
+            letter-spacing: 0.5px;
+        }
+
+            .input-field::placeholder {
+                color: #888;
+                font-weight: 400;
+            }
+
+            .input-field:focus {
+                outline: none;
+                border-color: var(--color-accent);
+                box-shadow: 0 0 0 4px rgba(111, 78, 55, 0.1);
+                background-color: white;
+                transform: translateY(-2px);
+            }
+
+                .input-field:focus + .input-icon {
+                    color: var(--color-primary);
+                    transform: scale(1.1) translateY(-2px);
+                }
+
+        .password-toggle {
+            position: absolute;
+            right: 18px;
+            top: 45px;
+            cursor: pointer;
+            color: var(--color-primary);
+            font-size: 18px;
+            transition: var(--transition);
+            background: none;
+            border: none;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .password-toggle:hover {
+                color: var(--color-accent);
+                transform: scale(1.1);
+            }
+
+        /* Code Inputs */
+        .code-inputs {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .code-input {
+            width: 60px;
+            height: 70px;
+            border: 2px solid var(--color-light);
+            border-radius: 10px;
+            text-align: center;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--color-accent);
+            transition: var(--transition);
+            background-color: var(--color-secondary);
+        }
+
+            .code-input:focus {
+                outline: none;
+                border-color: var(--color-primary);
+                box-shadow: 0 0 0 3px rgba(168, 165, 74, 0.1);
+                background-color: white;
+                transform: translateY(-3px);
+            }
+
+        /* Buttons - FIXED: Removed extra icons from all buttons except sign-in */
+        .btn-primary {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--color-accent), var(--color-dark-brown));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: 0 6px 15px rgba(111, 78, 55, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+            .btn-primary::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+                transition: 0.5s;
+            }
+
+            .btn-primary:hover::after {
+                left: 100%;
+            }
+
+            .btn-primary:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 10px 20px rgba(111, 78, 55, 0.3);
+            }
+
+            .btn-primary:active {
+                transform: translateY(-1px);
+                box-shadow: 0 5px 15px rgba(111, 78, 55, 0.2);
+            }
+
+        .btn-secondary {
+            width: 100%;
+            padding: 16px;
+            background-color: transparent;
+            color: var(--color-primary);
+            border: 2px solid var(--color-primary);
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+            .btn-secondary:hover {
+                background-color: var(--color-primary);
+                color: white;
+                transform: translateY(-2px);
+            }
+
+        /* FIXED: Only sign-in buttons have icons */
+        .btn-primary i {
+            /* Only show icons in sign-in buttons */
+        }
+
+        .btn-secondary i {
+            /* Show icons in back buttons */
+        }
+
+        /* Login buttons - Special styling for sign-in only */
+        .login-form .btn-primary {
+            padding: 18px;
+        }
+
+        .employee-login .btn-primary {
+            background: linear-gradient(135deg, var(--color-primary), #8F8A3F);
+            box-shadow: 0 6px 15px rgba(168, 165, 74, 0.2);
+        }
+
+            .employee-login .btn-primary:hover {
+                box-shadow: 0 10px 20px rgba(168, 165, 74, 0.3);
+            }
+
+        .forgot-link {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+            .forgot-link a {
+                color: var(--color-primary);
+                text-decoration: none;
+                transition: var(--transition);
+                padding: 5px 10px;
+                border-radius: 6px;
+                position: relative;
+            }
+
+                .forgot-link a::after {
+                    content: '';
+                    position: absolute;
+                    bottom: -2px;
+                    left: 0;
+                    width: 0;
+                    height: 1px;
+                    background-color: var(--color-accent);
+                    transition: var(--transition);
+                }
+
+                .forgot-link a:hover {
+                    color: var(--color-accent);
+                }
+
+                    .forgot-link a:hover::after {
+                        width: 100%;
+                    }
+
+        /* Back Button - FIXED: Removed extra icons */
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: none;
+            border: none;
+            color: var(--color-primary);
+            font-size: 18px;
+            cursor: pointer;
+            transition: var(--transition);
+            z-index: 11;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+            .back-button:hover {
+                color: var(--color-accent);
+                transform: translateX(-3px);
+            }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 13px;
+            color: var(--color-primary);
+            opacity: 0.8;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            animation: fadeIn 1s ease 0.5s both;
+        }
+
+        /* Security Note */
+        .security-note {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 15px;
+            font-size: 12px;
+            color: var(--color-primary);
+            opacity: 0.7;
+        }
+
+        /* Success Message */
+        .success-message {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(168, 165, 74, 0.1), rgba(111, 78, 55, 0.1));
+            border-radius: 12px;
+            margin-bottom: 25px;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .success-icon {
+            font-size: 48px;
+            color: var(--color-primary);
+            margin-bottom: 15px;
+            animation: bounce 1s ease infinite alternate;
+        }
+
+        /* Animations */
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @@keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @@keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @@keyframes bounce {
+            0% {
+                transform: translateY(0);
+            }
+
+            100% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @@keyframes shake {
+            0%, 100% {
+                transform: translateX(0);
+            }
+
+            10%, 30%, 50%, 70%, 90% {
+                transform: translateX(-5px);
+            }
+
+            20%, 40%, 60%, 80% {
+                transform: translateX(5px);
+            }
+        }
+
+        .shake {
+            animation: shake 0.5s ease;
+        }
+
+        /* Responsive */
+        @@media (max-width: 480px) {
+            .container {
+                max-width: 100%;
+            }
+
+            .login-card,
+            .recovery-card {
+                padding: 30px 25px;
+                border-radius: 16px;
+            }
+
+            .company-name {
+                font-size: 28px;
+            }
+
+            .logo {
+                width: 80px;
+                height: 80px;
+                font-size: 28px;
+            }
+
+            .step {
+                width: 28px;
+                height: 28px;
+                margin: 0 15px;
+            }
+
+            .step-line {
+                left: 40px;
+                right: 40px;
+                top: 14px;
+            }
+
+            .step-progress {
+                top: 14px;
+                left: 40px;
+            }
+
+            .code-input {
+                width: 50px;
+                height: 60px;
+                font-size: 24px;
+            }
+
+            .btn-primary {
+                padding: 16px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Logo Section -->
+        <div class="logo-section">
+            <div class="logo">
+                <img src="~/Content/pictures/logo.jpg" />
+            </div>
+            <h1 class="company-name">828 CAFE</h1>
+            <p class="company-tagline">PREMIUM COFFEE EXPERIENCE</p>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="content-area">
+            <!-- Back Button (hidden by default) -->
+            <button class="back-button" id="backButton" style="display: none;">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+
+            <!-- Login Card -->
+            <div class="login-card" id="loginCard">
+                <!-- Role Selector -->
+                <div class="role-selector">
+                    <div class="selector-background"></div>
+                    <div class="role-option active" data-role="admin">
+                        <i class="fas fa-user-shield"></i> Admin
+                    </div>
+                    <div class="role-option" data-role="employee">
+                        <i class="fas fa-user-tie"></i> Employee
+                    </div>
+                </div>
+
+                <!-- Admin Login Form -->
+                <form class="login-form active" id="admin-form">
+                    <h2 class="form-title">Admin Access Portal</h2>
+
+                    <div class="input-group">
+                        <label for="admin-username">Admin Email*</label>
+                        <input type="email" id="admin-username" ng-model="emailLogin" class="input-field" placeholder="Enter admin email" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="admin-password">Password*</label>
+                        <input type="password" id="admin-password" ng-model="passwordLogin" class="input-field" placeholder="Enter your password" required>
+                        <button type="button" class="password-toggle" id="admin-toggle">
+                        </button>
+                    </div>
+
+                    <button type="submit" class="btn-primary" ng-click="verifyUser('Admin')">
+                        <i class="fas fa-sign-in-alt"></i> Sign In as Admin
+                    </button>
+
+                    <div class="forgot-link">
+                        <div class="forgot-link">
+                            <a href="#" id="admin-forgot" ng-click="uType = 'Admin'">
+                                Forgot admin password?
+                            </a>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Employee Login Form -->
+                <form class="login-form" id="employee-form">
+                    <h2 class="form-title">Employee Access Portal</h2>
+
+                    <div class="input-group">
+                        <label for="employee-username">Employee Email*</label>
+                        <input type="email" id="employee-username" ng-model="emailLogin" class="input-field" placeholder="Enter employee email" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="employee-password">Password*</label>
+                        <input type="password" id="employee-password" ng-model="passwordLogin" class="input-field" placeholder="Enter your password" required>
+                        <button type="button" class="password-toggle" id="employee-toggle">
+                        </button>
+                    </div>
+
+                    <button type="submit" class="btn-primary" ng-click="verifyUser('Employee')">
+                        <i class="fas fa-sign-in-alt"></i> Sign In as Employee
+                    </button>
+                    <div class="forgot-link">
+                        <a href="#" id="employee-forgot" ng-click="uType = 'Employee'">
+                            Forgot employee password?
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Recovery Card 1: Email Input -->
+            <div class="recovery-card" id="recoveryEmail">
+                <div class="progress-steps">
+                    <div class="step active">1</div>
+                    <div class="step">2</div>
+                    <div class="step">3</div>
+                    <div class="step-line"></div>
+                    <div class="step-progress" style="width: 0;"></div>
+                </div>
+
+                <h2 class="recovery-title">Recover Your Password</h2>
+                <p class="recovery-description">Enter your email address and we'll send you a verification code to reset your password.</p>
+
+                <div class="input-group">
+                    <label for="recovery-email">Email Address*</label>
+                    <input type="email" id="recovery-email" ng-model="recoveryEmail" class="input-field" placeholder="Enter your registered email" required>
+                </div>
+
+                <button type="button" class="btn-primary" id="sendCodeBtn" ng-model="sendCodeBtn" ng-click="verifyEmail()">
+                    Send Verification Code
+                </button>
+
+                <button class="btn-secondary" id="backToLogin1">
+                    <i class="fas fa-arrow-left"></i> Back to Login
+                </button>
+            </div>
+
+            <!-- Recovery Card 2: Code Verification -->
+            <div class="recovery-card" id="recoveryCode">
+                <div class="progress-steps">
+                    <div class="step completed">1</div>
+                    <div class="step active">2</div>
+                    <div class="step">3</div>
+                    <div class="step-line"></div>
+                    <div class="step-progress" style="width: 50%;"></div>
+                </div>
+
+                <h2 class="recovery-title">Verify Your Identity</h2>
+                <p class="recovery-description">Enter the 6-digit verification code sent to your email address.</p>
+
+                <div class="code-inputs">
+                    <input type="text" class="code-input" maxlength="1" data-index="0" ng-model="otp.d1" onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                    <input type="text" class="code-input" maxlength="1" data-index="1" ng-model="otp.d2" onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                    <input type="text" class="code-input" maxlength="1" data-index="2" ng-model="otp.d3" onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                    <input type="text" class="code-input" maxlength="1" data-index="3" ng-model="otp.d4" onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                    <input type="text" class="code-input" maxlength="1" data-index="4" ng-model="otp.d5" onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                    <input type="text" class="code-input" maxlength="1" data-index="5" ng-model="otp.d6" onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                </div>
+
+                <p class="recovery-description" style="font-size: 14px; margin-top: -10px;">
+                    Didn't receive code? <a ng-click="verifyEmail('Admin')" id="resendCode" style="color: var(--color-primary); font-weight: 600;">Resend</a>
+                </p>
+
+                <button class="btn-primary" id="verifyCodeBtn" ng-click="validateOTP()">
+                    Verify Code
+                </button>
+
+                <button class="btn-secondary" id="backToEmail">
+                    <i class="fas fa-arrow-left"></i> Back to Email
+                </button>
+            </div>
+
+            <!-- Recovery Card 3: New Password -->
+            <div class="recovery-card" id="recoveryPassword">
+                <div class="progress-steps">
+                    <div class="step completed">1</div>
+                    <div class="step completed">2</div>
+                    <div class="step active">3</div>
+                    <div class="step-line"></div>
+                    <div class="step-progress" style="width: 100%;"></div>
+                </div>
+
+                <h2 class="recovery-title">Create New Password</h2>
+                <p class="recovery-description">Enter your new password. Make sure it's strong and secure.</p>
+
+                <div class="input-group">
+                    <label for="new-password">New Password*</label>
+                    <div style="position: relative;">
+                        <input type="password" id="new-password" class="input-field" placeholder="Enter new password" ng-model="nPassword" required style="padding-right: 45px;">
+                        <button type="button" class="password-toggle" id="newPasswordToggle" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--color-primary); font-size: 18px; padding: 0; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="confirm-password">Confirm Password*</label>
+                    <div style="position: relative;">
+                        <input type="password" id="confirm-password" class="input-field" placeholder="Confirm new password" ng-model="cPassword" required style="padding-right: 45px;">
+                        <button type="button" class="password-toggle" id="confirmPasswordToggle" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--color-primary); font-size: 18px; padding: 0; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button class="btn-primary" id="resetPasswordBtn" ng-click="updatePassword()">
+                    Reset Password
+                </button>
+
+                <button class="btn-secondary" id="backToCode">
+                    <i class="fas fa-arrow-left"></i> Back to Verification
+                </button>
+            </div>
+
+            <!-- Recovery Card 4: Success Message -->
+            <div class="recovery-card" id="recoverySuccess">
+                <div class="success-message">
+                    <div class="success-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h2 style="color: var(--color-primary); margin-bottom: 10px;">Password Reset Successful!</h2>
+                    <p style="color: var(--color-text); opacity: 0.8; margin-bottom: 20px;">
+                        Your password has been successfully reset. You can now login with your new password.
+                    </p>
+                </div>
+
+                <button class="btn-primary" id="goToLoginBtn">
+                    Go to Login Page
+                </button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>&copy; 2026 828 Cafe. All rights reserved. Secure login system.</p>
+            <div class="security-note">
+                <i class="fas fa-shield-alt"></i>
+                <span>Your credentials are protected with encryption</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Elements
+            const loginCard = document.getElementById('loginCard');
+            const recoveryEmail = document.getElementById('recoveryEmail');
+            const recoveryCode = document.getElementById('recoveryCode');
+            const recoveryPassword = document.getElementById('recoveryPassword');
+            const recoverySuccess = document.getElementById('recoverySuccess');
+            const backButton = document.getElementById('backButton');
+
+            // Login Elements
+            const roleOptions = document.querySelectorAll('.role-option');
+            const selectorBackground = document.querySelector('.selector-background');
+            const adminForm = document.getElementById('admin-form');
+            const employeeForm = document.getElementById('employee-form');
+            const adminToggle = document.getElementById('admin-toggle');
+            const employeeToggle = document.getElementById('employee-toggle');
+            const adminPassword = document.getElementById('admin-password');
+            const employeePassword = document.getElementById('employee-password');
+
+            // Code Inputs
+            const codeInputs = document.querySelectorAll('.code-input');
+
+            // Password Toggles for Recovery
+            const newPasswordToggle = document.getElementById('newPasswordToggle');
+            const confirmPasswordToggle = document.getElementById('confirmPasswordToggle');
+            const newPassword = document.getElementById('new-password');
+            const confirmPassword = document.getElementById('confirm-password');
+
+            // Buttons
+            const adminForgotBtn = document.getElementById('admin-forgot');
+            const employeeForgotBtn = document.getElementById('employee-forgot');
+            const sendCodeBtn = document.getElementById('sendCodeBtn');
+            const verifyCodeBtn = document.getElementById('verifyCodeBtn');
+            const resetPasswordBtn = document.getElementById('resetPasswordBtn');
+            const goToLoginBtn = document.getElementById('goToLoginBtn');
+            const resendCodeBtn = document.getElementById('resendCode');
+
+            // Back Buttons
+            const backToLogin1 = document.getElementById('backToLogin1');
+            const backToEmail = document.getElementById('backToEmail');
+            const backToCode = document.getElementById('backToCode');
+
+            // Current Recovery Step
+            let currentRecoveryStep = 'email';
+            let userType = 'admin';
+
+            //document.getElementById("adminForm").addEventListener("submit", function (e) {
+            //    e.preventDefault();
+            //});
+            //document.getElementById("employeeForm").addEventListener("submit", function (e) {
+            //    e.preventDefault();
+            //});
+
+
+            // Function to show recovery step
+            window.showRecoveryStep = function (step) {
+                recoveryEmail.classList.remove('active');
+                recoveryCode.classList.remove('active');
+                recoveryPassword.classList.remove('active');
+                recoverySuccess.classList.remove('active');
+
+                backButton.style.display = 'block';
+                loginCard.classList.add('hidden');
+
+                switch (step) {
+                    case 'email':
+                        recoveryEmail.classList.add('active');
+                        currentRecoveryStep = 'email';
+                        break;
+                    case 'code':
+                        recoveryCode.classList.add('active');
+                        currentRecoveryStep = 'code';
+                        break;
+                    case 'password':
+                        recoveryPassword.classList.add('active');
+                        currentRecoveryStep = 'password';
+                        break;
+                    case 'success':
+                        recoverySuccess.classList.add('active');
+                        currentRecoveryStep = 'success';
+                        backButton.style.display = 'none';
+                        break;
+                }
+            }
+
+            // Function to show login page
+            function showLoginPage() {
+                loginCard.classList.remove('hidden');
+                recoveryEmail.classList.remove('active');
+                recoveryCode.classList.remove('active');
+                recoveryPassword.classList.remove('active');
+                recoverySuccess.classList.remove('active');
+                backButton.style.display = 'none';
+                currentRecoveryStep = 'email';
+
+                codeInputs.forEach(input => input.value = '');
+                newPassword.value = '';
+                confirmPassword.value = '';
+            }
+
+            // Forgot Password Click Handlers
+            adminForgotBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                userType = 'admin';
+                showRecoveryStep('email');
+            });
+
+            employeeForgotBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                userType = 'employee';
+                showRecoveryStep('email');
+            });
+
+            //Send Code Button
+            sendCodeBtn.addEventListener('click', function () {
+                const email = document.getElementById('recovery-email').value;
+                if (!email) {
+                    alert('Please enter your email address.');
+                    return;
+                }
+
+                sendCodeBtn.innerHTML = 'Sending...';
+                sendCodeBtn.disabled = true;
+
+                setTimeout(() => {
+                    sendCodeBtn.innerHTML = 'Send Verification Code';
+                    sendCodeBtn.disabled = false;
+                    //showRecoveryStep('code');
+
+                    //const demoCode = '123456';
+                    //alert(`Demo: Verification code sent to ${email}. For this demo, use code: ${demoCode}`);
+                }, 1500);
+            });
+
+            // Code Input Navigation
+            codeInputs.forEach((input, index) => {
+                input.addEventListener('input', function () {
+                    if (this.value.length === 1) {
+                        if (index < codeInputs.length - 1) {
+                            codeInputs[index + 1].focus();
+                        } else {
+                            this.blur();
+                        }
+                    }
+                });
+
+                input.addEventListener('keydown', function (e) {
+                    if (e.key === 'Backspace' && this.value === '' && index > 0) {
+                        codeInputs[index - 1].focus();
+                    }
+                });
+            });
+
+            // Verify Code Button
+            verifyCodeBtn.addEventListener('click', function () {
+                let code = '';
+                codeInputs.forEach(input => code += input.value);
+
+                if (code.length !== 6) {
+                    alert('Please enter the complete 6-digit code.');
+                    return;
+                }
+
+                verifyCodeBtn.innerHTML = 'Verifying...';
+                verifyCodeBtn.disabled = true;
+
+                setTimeout(() => {
+                    verifyCodeBtn.innerHTML = 'Verify Code';
+                    verifyCodeBtn.disabled = false;
+                    //showRecoveryStep('password');
+                }, 1500);
+            });
+
+            // Reset Password Button
+            resetPasswordBtn.addEventListener('click', function () {
+                const newPass = newPassword.value;
+                const confirmPass = confirmPassword.value;
+
+                if (!newPass || !confirmPass) {
+                    alert('Please fill in both password fields.');
+                    return;
+                }
+
+                if (newPass !== confirmPass) {
+                    //alert('Passwords do not match.');
+                    newPassword.classList.add('shake');
+                    confirmPassword.classList.add('shake');
+                    setTimeout(() => {
+                        newPassword.classList.remove('shake');
+                        confirmPassword.classList.remove('shake');
+                    }, 500);
+                    return;
+                }
+
+                if (newPass.length < 6) {
+                    alert('Password must be at least 6 characters long.');
+                    return;
+                }
+
+                resetPasswordBtn.innerHTML = 'Resetting...';
+                resetPasswordBtn.disabled = true;
+
+                setTimeout(() => {
+                    resetPasswordBtn.innerHTML = 'Reset Password';
+                    resetPasswordBtn.disabled = false;
+                    showRecoveryStep('success');
+                }, 1500);
+            });
+
+            // Go to Login Button
+            goToLoginBtn.addEventListener('click', function () {
+                showLoginPage();
+            });
+
+            // Resend Code Button
+            resendCodeBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                resendCodeBtn.innerHTML = 'Resending...';
+                resendCodeBtn.style.pointerEvents = 'none';
+
+                setTimeout(() => {
+                    resendCodeBtn.innerHTML = 'Resend';
+                    resendCodeBtn.style.pointerEvents = 'all';
+                    alert('Verification code has been resent to your email.');
+                }, 1500);
+            });
+
+            // Back Button
+            backButton.addEventListener('click', function () {
+                if (currentRecoveryStep === 'email') {
+                    showLoginPage();
+                } else if (currentRecoveryStep === 'code') {
+                    showRecoveryStep('email');
+                } else if (currentRecoveryStep === 'password') {
+                    showRecoveryStep('code');
+                }
+            });
+
+            // Back to Login from Step 1
+            backToLogin1.addEventListener('click', function () {
+                showLoginPage();
+            });
+
+            // Back to Email from Step 2
+            backToEmail.addEventListener('click', function () {
+                showRecoveryStep('email');
+            });
+
+            // Back to Code from Step 3
+            backToCode.addEventListener('click', function () {
+                showRecoveryStep('code');
+            });
+
+            // Password Toggles for Recovery
+            if (newPasswordToggle) {
+                newPasswordToggle.addEventListener('click', function () {
+                    const icon = this.querySelector('i');
+                    if (newPassword.type === 'password') {
+                        newPassword.type = 'text';
+                        icon.classList.remove('fa-eye');
+                        icon.classList.add('fa-eye-slash');
+                    } else {
+                        newPassword.type = 'password';
+                        icon.classList.remove('fa-eye-slash');
+                        icon.classList.add('fa-eye');
+                    }
+                });
+            }
+
+            if (confirmPasswordToggle) {
+                confirmPasswordToggle.addEventListener('click', function () {
+                    const icon = this.querySelector('i');
+                    if (confirmPassword.type === 'password') {
+                        confirmPassword.type = 'text';
+                        icon.classList.remove('fa-eye');
+                        icon.classList.add('fa-eye-slash');
+                    } else {
+                        confirmPassword.type = 'password';
+                        icon.classList.remove('fa-eye-slash');
+                        icon.classList.add('fa-eye');
+                    }
+                });
+            }
+
+            // Existing login functionality
+            roleOptions.forEach(option => {
+                option.addEventListener('click', function () {
+                    const role = this.getAttribute('data-role');
+
+                    roleOptions.forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+
+                    if (role === 'employee') {
+                        selectorBackground.classList.add('employee');
+                        adminForm.classList.remove('active');
+                        employeeForm.classList.add('active');
+                        document.querySelector('.login-card').classList.add('employee-login');
+                    } else {
+                        selectorBackground.classList.remove('employee');
+                        adminForm.classList.add('active');
+                        employeeForm.classList.remove('active');
+                        document.querySelector('.login-card').classList.remove('employee-login');
+                    }
+                });
+            });
+
+            if (adminToggle) {
+                adminToggle.addEventListener('click', function () {
+                    const icon = this.querySelector('i');
+                    if (adminPassword.type === 'password') {
+                        adminPassword.type = 'text';
+                        icon.classList.remove('fa-eye');
+                        icon.classList.add('fa-eye-slash');
+                    } else {
+                        adminPassword.type = 'password';
+                        icon.classList.remove('fa-eye-slash');
+                        icon.classList.add('fa-eye');
+                    }
+                });
+            }
+
+            if (employeeToggle) {
+                employeeToggle.addEventListener('click', function () {
+                    const icon = this.querySelector('i');
+                    if (employeePassword.type === 'password') {
+                        employeePassword.type = 'text';
+                        icon.classList.remove('fa-eye');
+                        icon.classList.add('fa-eye-slash');
+                    } else {
+                        employeePassword.type = 'password';
+                        icon.classList.remove('fa-eye-slash');
+                        icon.classList.add('fa-eye');
+                    }
+                });
+            }
+
+            //adminForm.addEventListener('submit', function (e) {
+            //    e.preventDefault();
+            //    const username = document.getElementById('admin-username').value;
+            //    const password = adminPassword.value;
+
+            //    if (username && password) {
+            //        alert(`Admin login attempt for: ${username}\n\nIn a real application, this would authenticate with your backend.`);
+            //        this.reset();
+            //    } else {
+            //        alert('Please fill in both username and password.');
+            //    }
+            //});
+
+            //employeeForm.addEventListener('submit', function (e) {
+            //    e.preventDefault();
+            //    const username = document.getElementById('employee-username').value;
+            //    const password = employeePassword.value;
+
+            //    //if (username && password) {
+            //    //    //alert(`Employee login attempt for ID: ${username}\n\nIn a real application, this would authenticate with your backend.`);
+            //    //    //this.reset();
+            //    //} else {
+            //    //    alert('Please fill in both employee ID and password.');
+            //    //}
+            //});
+
+            // Add subtle background animation
+            document.body.style.animation = 'fadeIn 1s ease';
+        });
+    </script>
+</body>
+</html>
